@@ -1,2 +1,2 @@
-# Clustering-and-allocation
-K-Means Clustering and Allocation
+# K-Means Clustering and Allocation
+Generating centre values and allocating the centres to new data 
