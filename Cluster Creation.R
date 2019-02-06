@@ -17,7 +17,7 @@ library(RSQLite)
 dir.create('~/.redshiftTools')
 download.file('http://s3.amazonaws.com/redshift-downloads/drivers/RedshiftJDBC41-1.1.9.1009.jar','~/.redshiftTools/redshift-driver.jar')
 driver <- JDBC("com.amazon.redshift.jdbc41.Driver", "~/.redshiftTools/redshift-driver.jar", identifier.quote="`")
-url <- sprintf("jdbc:postgresql://genting.cnpzuz3xslqd.us-west-2.redshift.amazonaws.com:")
+url <- sprintf("jdbc:postgresql://redshift.amazonaws.com:")
 jconn <- dbConnect(driver, url, 'shashank_kumar', '***')
 dbListTables(jconn)
 
