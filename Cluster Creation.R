@@ -22,32 +22,32 @@ jconn <- dbConnect(driver, url, 'shashank_kumar', '***')
 dbListTables(jconn)
 
 
-Mal_Mus <- dbGetQuery(jconn, 'Select * from temp.blue_customer_12Dec2018_data_Mal_Mus')
-Mal_Mus_data <- subset(Mal_Mus, Mal_Mus$new_cust==0)
-Mal_Mus_data_prcnt <- Mal_Mus_data[,c(9:21)]
-Mal_Mus_data_int <- Mal_Mus_data[,c(22:30)]
+Cust <- dbGetQuery(jconn, 'Select * from temp.customer_12Dec2018_data_')
+Cust_data <- subset(Cust, Cust$new_cust==0)
+Cust_data_prcnt <- Cust_data[,c(9:21)]
+Cust_data_int <- Cust_data[,c(22:30)]
 
 #Capping 
 Cap <- function(x){ stopifnot(is.numeric(x))
   quantiles <- quantile( x, c(.001, .97 ) , na.rm = TRUE)
   x[ x < quantiles[1] ] <- quantiles[1]
   x[ x > quantiles[2] ] <- quantiles[2]
-  x
+  
 }
 
-Mal_Mus_data_int <- as.data.frame(lapply(Mal_Mus_data_int , Cap))
-Mal_Mus_data_final <- cbind.data.frame(Mal_Mus_data_prcnt,Mal_Mus_data_int)
+Cust_data_int <- as.data.frame(lapply(Cust_data_int , Cap))
+Cust_data_final <- cbind.data.frame(Cust_data_prcnt,Cust_data_int)
 
 #Scaling (Normalization)
 normalise <- function(x) {(x - min(x, na.rm=TRUE))/(max(x,na.rm=TRUE) -
                                                       min(x, na.rm=TRUE))}
-Mal_Mus_data_final_nor <- as.data.frame(lapply(Mal_Mus_data_final, normalise))
+Cust_data_final_nor <- as.data.frame(lapply(Cust_data_final, normalise))
 
 
 #Elbow Curve
 set.seed(1230)
 wcsx = vector()
-for (i in 1:20) wcsx[i] = sum(kmeans(Mal_Mus_data_final_nor, i, iter.max = 100, nstart = 10)$withinss)
+for (i in 1:20) wcsx[i] = sum(kmeans(Cust_data_final_nor, i, iter.max = 100, nstart = 10)$withinss)
 plot(1:20,
      wcsx,
      type = 'b',
@@ -56,16 +56,16 @@ plot(1:20,
      ylab = 'WCSS')
 
 #KMeans Clustering
-Mal_Mus_Cluster <- kmeans(Mal_Mus_data_final_nor, 10, iter.max = 100, nstart=20)
+Cust_Cluster <- kmeans(Cust_data_final_nor, 10, iter.max = 100, nstart=20)
 
 #Scaled Centre Values
-write.csv(Mal_Mus_Cluster$centers, '12Dec_Scaled_Mal_Mus_centroid.csv')
+write.csv(Cust_Cluster$centers, '12Dec_Scaled_Cust_centroid.csv')
 
 #Descaling of the data
-d.min <- round(colwise(min)(Mal_Mus_data_final), digits = 2)
-d.max <- round(colwise(max)(Mal_Mus_data_final), digits = 2)
+d.min <- round(colwise(min)(Cust_data_final), digits = 2)
+d.max <- round(colwise(max)(Cust_data_final), digits = 2)
 d.d <-  rbind.data.frame(d.min,d.max)
-m <- as.data.frame(Mal_Mus_Cluster$centers)
+m <- as.data.frame(Cust_Cluster$centers)
 rm(abc)
 abc <- data.frame()
 temp <- data.frame()
@@ -76,16 +76,16 @@ abc <- round(rbind(abc,temp), digits = 2)
 colnames(abc) <- colnames(m)
 abc
 
-Mal_Mus_Centre_Value <- cbind.data.frame(Mal_Mus_Cluster$size, abc )
+Cust_Centre_Value <- cbind.data.frame(Cust_Cluster$size, abc )
 
-datatable(Mal_Mus_Centre_Value )%>%
-  formatStyle(names(Mal_Mus_Centre_Value ),
-              background = styleColorBar(range(Mal_Mus_Centre_Value), 'lightblue'),
+datatable(Cust_Centre_Value )%>%
+  formatStyle(names(Cust_Centre_Value ),
+              background = styleColorBar(range(Cust_Centre_Value), 'lightblue'),
               backgroundRepeat = 'no-repeat',
               backgroundPosition = 'center',
               color = 'black')
 
 #Original Centre Values
-write.csv(Mal_Mus_Centre_Value , "12Dec_Malaysian_Muslim_Centres.csv")
+write.csv(Cust_Centre_Value , "12Dec_Month.csv")
 
 
