@@ -49,7 +49,7 @@ normalise <- function(x) {(x - min(x, na.rm=TRUE))/(max(x,na.rm=TRUE) -
 data_integer <- as.data.frame(lapply(data_integer, normalise))
 data_cust <- cbind(data_integer,data_binary)
 
-#Cluster Allocation
+#Euclidean Distance
 set.seed(123)
 temp = data.frame()
 for (k in 1:nrow(centre_value_cust))
@@ -61,6 +61,7 @@ for (k in 1:nrow(centre_value_cust))
                                                            +(x[17]-centre_value_cust[k,17])^2+(x[18]-centre_value_cust[k,18])^2+(x[19]-centre_value_cust[k,19])^2+(x[20]-centre_value_cust[k,20])^2
                                                            +(x[21]-centre_value_cust[k,21])^2+(x[22]-centre_value_cust[k,22])^2))},centre_value_cust)
 
+ #Minimum Distance Cluster Allocation
 final <-data.frame(apply(temp,1, FUN=which.min))
 colnames(final) <- c('Cluster_Number')
 final
